@@ -1,1 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Folder File Search</title>
 
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f6f8;
+        margin: 0;
+        padding: 20px;
+    }
+
+    h1 {
+        text-align: center;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: auto;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+    }
+
+    .file-list {
+        margin-top: 20px;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .file-item {
+        padding: 8px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .file-item:hover {
+        background: #f0f0f0;
+    }
+
+    .highlight {
+        background: yellow;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>📁 File Search</h1>
+
+    <input type="file" id="folderInput" webkitdirectory multiple>
+    <input type="text" id="searchBox" placeholder="Search files...">
+
+    <div class="file-list" id="fileList"></div>
+</div>
+
+<script>
+    const folderInput = document.getElementById('folderInput');
+    const searchBox = document.getElementById('searchBox');
+    const fileList = document.getElementById('fileList');
+
+    let files = [];
+
+    folderInput.addEventListener('change', (event) => {
+        files = Array.from(event.target.files);
+        displayFiles(files);
+    });
+
+    searchBox.addEventListener('input', () => {
+        const query = searchBox.value.toLowerCase();
+
+        const filtered = files.filter(file =>
+            file.webkitRelativePath.toLowerCase().includes(query)
+        );
+
+        displayFiles(filtered, query);
+    });
+
+    function displayFiles(fileArray, query = "") {
+        fileList.innerHTML = "";
+
+        if (fileArray.length === 0) {
+            fileList.innerHTML = "<p>No files found</p>";
+            return;
+        }
+
+        fileArray.forEach(file => {
+            let path = file.webkitRelativePath;
+
+            if (query) {
+                const regex = new RegExp(`(${query})`, "gi");
+                path = path.replace(regex, `<span class="highlight">$1</span>`);
+            }
+
+            const div = document.createElement('div');
+            div.className = 'file-item';
+            div.innerHTML = path;
+
+            fileList.appendChild(div);
+        });
+    }
+</script>
+
+</body>
+</html>
